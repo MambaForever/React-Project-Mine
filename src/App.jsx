@@ -1,15 +1,22 @@
 import React, { Component } from 'react'
-// 按需引入antd组件标签
-import {Button} from 'antd'
+// 按需引入react路由相关组件标签
+import {Route,Switch,Redirect} from 'react-router-dom'
+
+// 引入一级路由组件
+import Login from './pages/Login/Login'
+import Admin from './pages/Admin/Admin'
 
 export default class App extends Component {
   render() {
     return (
-      <div>
-        <h2>App...</h2>
-        <Button>chilk me</Button>
-        <Button type="primary">touch me</Button>
-      </div>
+      
+        <Switch>
+          {/* 注册路由 */}
+          <Route path="/login" component={Login} />
+          <Route path="/admin" component={Admin} />
+          <Redirect to='/login' />
+        </Switch>
+      
     )
   }
 }
