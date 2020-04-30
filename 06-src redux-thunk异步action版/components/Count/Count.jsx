@@ -25,10 +25,8 @@ export default class Count extends Component {
 
   // 异步增加按钮回调
   incrementAsync = () => {
-    setTimeout(() => {
-      let {value} = this.refs.num
-      this.props.increment(value*1)
-    }, 500);
+    let {value} = this.refs.num
+    this.props.incrementAsync(value*1,1000)
   }
 
   render() {

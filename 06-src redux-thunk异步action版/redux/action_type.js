@@ -2,6 +2,5 @@
 
 let INCREMENT = 'increment'
 let DECREMENT = 'decrement'
-let ADD_PERSON = 'addPerson'
 
-export {INCREMENT,DECREMENT,ADD_PERSON}
+export {INCREMENT,DECREMENT}
