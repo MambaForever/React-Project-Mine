@@ -4,7 +4,7 @@ export default class Admin extends Component {
   render() {
     return (
       <div>
-        <h2>Admin...</h2>
+        <h2 style={{fontSize:'38px',fontWeight:'bold',color:'purple'}}>Admin...</h2>
       </div>
     )
   }

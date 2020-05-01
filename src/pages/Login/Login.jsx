@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
+// 引入react路由所需组件标签
+import {Route} from 'react-router-dom'
+// 引入Admin路由组件
+import Admin from '@/pages/Admin/Admin'
 // 按需引入antd组件标签
 import { Form, Input, Button, message } from 'antd'
 // 引入相关图标字体
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 // 引入发送请求的函数
-import {postLogin} from '../../api'
+import {postLogin} from '@/api'
 // 引入样式文件
 import './css/Login.less'
 // 引入图片路径
@@ -18,6 +22,8 @@ export default class Login extends Component {
       let result = await postLogin(values)
       if (result.status === 0) {
         console.log(result)
+        // 编程式跳转到admin路由组件
+        this.props.history.push("/admin")
       }else if (result.status === 1) {
         message.error(result.msg)
       }
@@ -116,6 +122,7 @@ export default class Login extends Component {
             </Form.Item>
           </Form>
         </div>
+        <Route path="/admin" component={Admin} />
       </div>
     )
   }

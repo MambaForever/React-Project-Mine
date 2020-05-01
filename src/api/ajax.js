@@ -14,7 +14,7 @@ import qs from 'querystring'
 import {message} from 'antd'
 
 // 1.配置请求的基础路径
-axios.defaults.baseURL = 'http://localhost:3000'
+axios.defaults.baseURL = '/api'
 // 2.配置超时时间
 axios.defaults.timeout = 2000
 
