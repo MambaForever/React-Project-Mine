@@ -1,6 +1,10 @@
 // redux的核心管理对象store
 
-// 从redux模块中引入创建store的方法
+/* 
+  从redux库中引入:
+  1.创建store对象的createStore方法
+  2.应用基于redux的中间件(插件库)的applyMiddleware方法
+*/
 import {createStore,applyMiddleware} from 'redux'
 // 引入汇总后的总reducer
 import reducers from './reducers'
