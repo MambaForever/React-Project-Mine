@@ -1,8 +1,14 @@
+// Login父容器组件
+
 import React, { Component } from 'react'
+
+// 从react-redux库中引入connect方法创建父容器组件
+import {connect} from 'react-redux'
+// 引入相关action
+import {saveUserInfoAction} from '@/redux/actions/login'
+
 // 引入react路由所需组件标签
-import {Route} from 'react-router-dom'
-// 引入Admin路由组件
-import Admin from '@/pages/Admin/Admin'
+import {Redirect} from 'react-router-dom'
 // 按需引入antd组件标签
 import { Form, Input, Button, message } from 'antd'
 // 引入相关图标字体
@@ -14,22 +20,17 @@ import './css/Login.less'
 // 引入图片路径
 import logo from './images/logo.png'
 
-export default class Login extends Component {
+class Login extends Component {
 
   // 提交表单的回调
   onFinish = async values => {
-    try {
-      let result = await postLogin(values)
-      if (result.status === 0) {
-        console.log(result)
-        // 编程式跳转到admin路由组件
-        this.props.history.push("/admin")
-      }else if (result.status === 1) {
-        message.error(result.msg)
-      }
-      
-    } catch (error) {
-      // console.log(error)
+    let result = await postLogin(values)
+    if (result.status === 0) {
+      this.props.saveUserInfoAction(result.data)
+      // 编程式跳转到admin路由组件
+      this.props.history.replace("/admin")
+    }else if (result.status === 1) {
+      message.error(result.msg,1.5)
     }
   }
 
@@ -61,6 +62,9 @@ export default class Login extends Component {
 
 
   render() {
+    // 判断当前是否登录,如果已登录,就跳转到admin路由页面
+    let {isLogin} = this.props
+    if (isLogin) return <Redirect to="/admin" />
     return (
       <div className="wrap">
         <header>
@@ -122,8 +126,14 @@ export default class Login extends Component {
             </Form.Item>
           </Form>
         </div>
-        <Route path="/admin" component={Admin} />
+        {/* <Route path="/admin" component={Admin} /> */}
       </div>
     )
   }
 }
+
+// 创建并暴露login父容器组件
+export default connect(
+  state => ({isLogin:state.userInfo.isLogin}),
+  {saveUserInfoAction}
+)(Login)

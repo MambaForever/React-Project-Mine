@@ -1,0 +1,48 @@
+.header-wrap {
+  height: 80px;
+  background-color: #fff;
+
+  // 头部上方
+  .header-top {
+    height: 40px;
+    border-bottom: 2px solid purple;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    .welcome {
+      margin: 0 10px;
+    }
+  }
+  // 头部下方
+  .header-bottom {
+    height: 40px;
+    display: flex;
+    line-height: 40px;
+    .bottom-left{
+      text-align: center;
+      width: 25%;
+      position: relative;
+
+      // 首页下面的小箭头
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        border-top: 20px solid purple;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+      }
+    }
+    .bottom-right{
+      padding-right: 5px;
+      width: 75%;
+      text-align: right;
+      span {
+        margin: 0 5px;
+      }
+    }
+  }
+
+}

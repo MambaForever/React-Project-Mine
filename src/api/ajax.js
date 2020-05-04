@@ -4,7 +4,8 @@
 		2.配置超时时间
 		3.统一处理post请求json编码问题（转为urlencoded）
 		4.统一返回真正的数据data，而不是response对象
-		5.统一处理错误
+    5.统一处理错误
+    6.请求统一添加进度条
 
 */
 import axios from 'axios'
@@ -12,6 +13,9 @@ import axios from 'axios'
 import qs from 'querystring'
 // 按需引入antd组件标签
 import {message} from 'antd'
+// 引入加载进度条的nprogress库及样式
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 // 1.配置请求的基础路径
 axios.defaults.baseURL = '/api'
@@ -20,6 +24,8 @@ axios.defaults.timeout = 2000
 
 // 设置请求拦截器
 axios.interceptors.request.use(config => {
+  // 6.请求统一添加进度条
+  NProgress.start()
   let {method,data} = config
   // 3.统一处理post请求json编码问题（转为urlencoded）
   if (method.toLowerCase() === 'post' && data instanceof Object) {
@@ -30,6 +36,8 @@ axios.interceptors.request.use(config => {
 
 // 响应拦截器请求失败的回调
 function handleError(error) {
+  // 6.请求统一添加进度条
+  NProgress.done()
   let msg = '未知错误'
   let errMsg = error.message
   if (errMsg.indexOf('timeout') !== -1) {
@@ -47,6 +55,8 @@ function handleError(error) {
 // 设置响应拦截器
 axios.interceptors.response.use(
   response => {
+    // 6.请求统一添加进度条
+    NProgress.done()
     return response.data
   },
   handleError

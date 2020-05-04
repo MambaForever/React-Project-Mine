@@ -3,8 +3,8 @@ import React, { Component } from 'react'
 import {Route,Switch,Redirect} from 'react-router-dom'
 
 // 引入一级路由组件
-import Login from './pages/Login/Login'
-import Admin from './pages/Admin/Admin'
+import Login from './containers/Login/Login'
+import Admin from './containers/Admin/Admin'
 
 export default class App extends Component {
   render() {
