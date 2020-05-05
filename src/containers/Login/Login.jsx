@@ -7,8 +7,6 @@ import {connect} from 'react-redux'
 // 引入相关action
 import {saveUserInfoAction} from '@/redux/actions/login'
 
-// 引入react路由所需组件标签
-import {Redirect} from 'react-router-dom'
 // 按需引入antd组件标签
 import { Form, Input, Button, message } from 'antd'
 // 引入相关图标字体
@@ -21,7 +19,7 @@ import {postLogin} from '@/api'
 // 引入样式文件
 import './css/Login.less'
 // 引入图片路径
-import logo from './images/logo.png'
+import logo from '@/assets/images/logo.png'
 
 // 改用装饰器语法使用connect方法创建Login父容器组件
 @connect(
@@ -71,9 +69,6 @@ class Login extends Component {
 
 
   render() {
-    // 判断当前是否登录,如果已登录,就跳转到admin路由页面
-    // let {isLogin} = this.props
-    // if (isLogin) return <Redirect to="/admin" />
     return (
       <div className="wrap">
         <header>
