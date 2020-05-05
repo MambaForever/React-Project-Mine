@@ -14,6 +14,11 @@ import {
 
 // 引入切换全屏的库screenfull
 import screenfull from 'screenfull'
+// 引入处理时间日期的dayjs库
+import dayjs from 'dayjs'
+
+// 引入获取天气信息的方法
+import {getJsonpWeather} from '@/api'
 
 // 引入退出登录的action
 import {deleteUserInfoAction} from '@/redux/actions/login'
@@ -23,10 +28,17 @@ import './css/header.less'
 // 从antd的Modal中引入confirm
 const { confirm } = Modal;
 
+// 改用装饰器语法使用connect方法创建Header父容器组件
+@connect(
+  state => ({name:state.userInfo.user.username}),  //mapStateToProps
+  {deleteUserInfoAction}  //mapDispatchToProps
+)
 class Header extends Component {
 
   state = {
     isFull: false,  // 当前页面是否全屏
+    weatherData: {},  // 获取的天气信息数据
+    time: '', // 当前时间数据
   }
 
   // 组件挂载完成的生命周期钩子
@@ -36,6 +48,18 @@ class Header extends Component {
       let {isFull} = this.state
       this.setState({isFull:!isFull})
     })
+
+    // 获取/更新天气信息的函数: 暂时写在"欢迎"的点击回调中,防止请求次数过多
+
+    // 开启定时器配合dayjs更新当前日期时间
+    this.timer = setInterval(() => {
+      this.setState( {time: dayjs().format('YYYY年  MM月DD日  HH:mm:ss  ')} )
+    }, 1000);
+  }
+
+  // 组件将要卸载的生命周期钩子
+  componentWillUnmount(){  // 在此钩子中做取消定时器等操作
+    clearInterval(this.timer)
   }
 
   // 点击全屏/退出全屏回调
@@ -58,7 +82,17 @@ class Header extends Component {
     })
   }
 
+  // 点击获取/更新天气信息的测试回调
+  getWeather = async () => {
+    let result = await getJsonpWeather()
+    // 从获取的天气数据中得到天气图片路径、天气和温度信息
+    let {currentCity} = result[0]
+    let {dayPictureUrl,weather,temperature} = result[0].weather_data[0]
+    this.setState({weatherData:{currentCity,dayPictureUrl,weather,temperature}})
+  }
+
   render() {
+    let {currentCity,dayPictureUrl,weather,temperature} = this.state.weatherData
     return (
       <div className='header-wrap'>
         {/* 头部上方 */}
@@ -66,17 +100,18 @@ class Header extends Component {
           <Button size='small' onClick={this.fullScreen}>
             {this.state.isFull ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
           </Button>
-          <span className='welcome'>欢迎, {this.props.name}</span>
+          <span className='welcome' onClick={this.getWeather}>欢迎, {this.props.name}</span>
           <Button type='link' size='small' onClick={this.logout}>退出登录</Button>
         </div>
         {/* 头部下方 */}
         <div className='header-bottom'>
           <h2 className='bottom-left'>首页</h2>
           <div className='bottom-right'>
-            <span>2020年 05月05日 00:14:05</span>
-            <img src="" alt="weather" />
-            <span>小雨转雾</span>
-            <span>温度: 14 ~ 26℃</span>
+            <span>{this.state.time}</span>
+            <span>{currentCity}</span>
+            <img src={dayPictureUrl} alt="weather" width='24px' />
+            <span>{weather}</span>
+            <span>{temperature}</span>
           </div>
         </div>
       </div>
@@ -84,8 +119,10 @@ class Header extends Component {
   }
 }
 
+export default Header
+
 // 创建并暴露Header父容器组件
-export default connect(
+/* export default connect(
   state => ({name:state.userInfo.user.username}),  //mapStateToProps
   {deleteUserInfoAction}  //mapDispatchToProps
-)(Header)
+)(Header) */

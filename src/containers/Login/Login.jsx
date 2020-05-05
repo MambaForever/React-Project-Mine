@@ -13,6 +13,9 @@ import {Redirect} from 'react-router-dom'
 import { Form, Input, Button, message } from 'antd'
 // 引入相关图标字体
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+
+// 引入高阶组件校验用户权限
+import CheckLogin from '@/containers/Hoc/CheckLogin'
 // 引入发送请求的函数
 import {postLogin} from '@/api'
 // 引入样式文件
@@ -20,6 +23,12 @@ import './css/Login.less'
 // 引入图片路径
 import logo from './images/logo.png'
 
+// 改用装饰器语法使用connect方法创建Login父容器组件
+@connect(
+  state => ({isLogin:state.userInfo.isLogin}),
+  {saveUserInfoAction}
+)
+@CheckLogin  // 使用装饰器语法调用高阶组件并传入Login组件做校验
 class Login extends Component {
 
   // 提交表单的回调
@@ -63,8 +72,8 @@ class Login extends Component {
 
   render() {
     // 判断当前是否登录,如果已登录,就跳转到admin路由页面
-    let {isLogin} = this.props
-    if (isLogin) return <Redirect to="/admin" />
+    // let {isLogin} = this.props
+    // if (isLogin) return <Redirect to="/admin" />
     return (
       <div className="wrap">
         <header>
@@ -132,8 +141,10 @@ class Login extends Component {
   }
 }
 
+export default Login
+
 // 创建并暴露login父容器组件
-export default connect(
+/* export default connect(
   state => ({isLogin:state.userInfo.isLogin}),
   {saveUserInfoAction}
-)(Login)
+)(Login) */
