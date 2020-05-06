@@ -3,6 +3,16 @@ import React, { Component } from 'react'
 // 按需引入antd组件标签
 import { Menu } from 'antd';
 
+/* 
+ 从react-router-dom库中按需引入组件标签
+ withRouter是react-router-dom提供的高阶组件,能够将一般组件包装成路由组件,使一般组件也可以拥有路由组件的props
+*/
+import {Link,withRouter} from 'react-router-dom'
+// 因为用到redux所以引入connect方法
+import {connect} from 'react-redux'
+// 引入操作redux状态的action
+import {saveTitleAction} from '@/redux/actions/title'
+
 // 引入图片路径
 import logo from '@/assets/images/logo.png'
 // 加载样式文件
@@ -12,8 +22,37 @@ import menus from '@/config/menu_config'
 
 const { SubMenu,Item } = Menu;
 
+@connect(
+  () => ({}),  //映射状态
+  {saveTitleAction}  //映射操作状态的方法
+)
+@withRouter  // 使用装饰器语法调用高阶组件
+class MenuNav extends Component {
 
-export default class MenuNav extends Component {
+  // 组件挂载完成的生命周期钩子
+  componentDidMount(){
+    // this.initTitle(menus)
+  }
+
+  // 此函数为刷新时传递当前title的逻辑函数
+  initTitle = (menusArr) => {
+    let {pathname} = this.props.location  // 得到当前路径
+    let currentKey = pathname.split('/').slice(-1)[0]  // 通过路径得到当前菜单的key值
+    let currentObj = menusArr.find(menusObj => {  // 利用递归找到和当前菜单匹配的菜单配置对象
+        
+        if (menusObj.children) {
+          this.initTitle(menusObj.children)
+        }
+        return menusObj.key === currentKey
+      
+    })
+    this.saveTitle(currentObj.title)
+  }
+
+  // 点击传递title数据的回调
+  saveTitle = title => {
+    this.props.saveTitleAction(title)
+  }
 
   // 生成菜单的函数
   generateMenu = (receiveMenus) => {
@@ -27,8 +66,10 @@ export default class MenuNav extends Component {
         )
       }else { //如果没有子菜单,return Item
         return (
-          <Item key={menu.key} icon={<menu.icon />}>
-            {menu.title}
+          <Item key={menu.key}>
+            <Link to={menu.path} onClick={() => {this.saveTitle(menu.title)}}>
+              <menu.icon />{menu.title}
+            </Link>
           </Item>
         )
       }
@@ -38,6 +79,11 @@ export default class MenuNav extends Component {
   }
 
   render() {
+    // 获取要刷新页面初始选中和展开的菜单(保证在当前页面刷新不会出现页面与选中不符的bug)
+    let {pathname} = this.props.location  // 得到当前路径
+    let keyArr = pathname.split('/')  // 初始展开的菜单
+    let currentKeyArr = keyArr.slice(-1)  // 初始选中的菜单
+
     return (
       <div>
         <div className="nav-top">
@@ -48,8 +94,8 @@ export default class MenuNav extends Component {
         </div>
         
         <Menu
-          defaultSelectedKeys={['home']}  // 初始默认选中哪个菜单
-          defaultOpenKeys={['sub1']}  // 初始默认展开哪个菜单
+          selectedKeys={currentKeyArr}  // 初始默认选中哪个菜单
+          defaultOpenKeys={keyArr}  // 初始默认展开哪个菜单
           mode="inline"  // 展开模式: 垂直行内
           theme="dark"  // 主题:暗色
         >
@@ -60,3 +106,5 @@ export default class MenuNav extends Component {
     );
   }
 }
+
+export default MenuNav

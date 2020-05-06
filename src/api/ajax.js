@@ -6,7 +6,7 @@
 		4.统一返回真正的数据data，而不是response对象
     5.统一处理错误
     6.请求统一添加进度条
-
+    7.如果有token,请求统一携带token
 */
 import axios from 'axios'
 // 引入将对象转换成urlencoded的模块
@@ -16,6 +16,10 @@ import {message} from 'antd'
 // 引入加载进度条的nprogress库及样式
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+// 引入redux核心管理对象store
+import store from '@/redux/store'
+// 引入删除用户信息的action
+import {deleteUserInfoAction} from '@/redux/actions/login'
 
 // 1.配置请求的基础路径
 axios.defaults.baseURL = '/api'
@@ -31,6 +35,11 @@ axios.interceptors.request.use(config => {
   if (method.toLowerCase() === 'post' && data instanceof Object) {
     config.data = qs.stringify(data)
   }
+  // 7.如果有token,请求统一携带token
+  let token = store.getState().userInfo.token
+  if (token) {
+    config.headers.Authorization = 'atguigu_' + token  // token前面都加上"atguigu_",安全性高一些
+  }
   return config
 })
 
@@ -42,8 +51,9 @@ function handleError(error) {
   let errMsg = error.message
   if (errMsg.indexOf('timeout') !== -1) {
     msg = '请求超时'
-  }else if (errMsg.indexOf('401') !== -1) {
-    msg = '您的权限不够或未登录'
+  }else if (errMsg.indexOf('401') !== -1) {  // 如果请求返回401即身份过期,则删除所有用户信息并跳转到登录页面
+    msg = '身份过期或未登录,需重新登录'
+    store.dispatch(deleteUserInfoAction())
   } else if (errMsg.indexOf('Network') !== -1) {
     msg = '网络出错,请检查网络连接状况'
   }

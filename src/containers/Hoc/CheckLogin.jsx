@@ -19,8 +19,8 @@ export default (PreComponent) => {
   class TargetComponent extends Component {
 
     render(){
-      let {pathname} = this.props.location
-      let {isLogin} = this.props
+      let {pathname} = this.props.location  //获取访问的地址
+      let {isLogin} = this.props  //获取登录标识
       // 校验用户登录状态确定访问权限
       if (isLogin && pathname==='/login') {  // 如果已经登录并且想访问login组件,则让你跳转到admin组件
         return <Redirect to="/admin" />

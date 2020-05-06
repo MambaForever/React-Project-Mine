@@ -34,7 +34,10 @@ let getJsonpWeather = () => {
 
 // 向后台发送登录请求
 let postLogin = userInfo => ajax.post('/login',userInfo)
+// 向后台发送获取分类列表请求
+let getCategoryList = () => ajax.get('/manage/category/list')
 
 
 // 向外暴露发送请求的函数
-export {postLogin,getJsonpWeather}
+export {postLogin,getJsonpWeather,getCategoryList}
+

@@ -29,8 +29,8 @@ import './css/header.less'
 const { confirm } = Modal;
 
 // 改用装饰器语法使用connect方法创建Header父容器组件
-@connect(
-  state => ({name:state.userInfo.user.username}),  //mapStateToProps
+@connect(  
+  state => ({name:state.userInfo.user.username,title: state.title}),  //mapStateToProps
   {deleteUserInfoAction}  //mapDispatchToProps
 )
 class Header extends Component {
@@ -105,7 +105,7 @@ class Header extends Component {
         </div>
         {/* 头部下方 */}
         <div className='header-bottom'>
-          <h2 className='bottom-left'>首页</h2>
+        <h2 className='bottom-left'>{this.props.title}</h2>
           <div className='bottom-right'>
             <span>{this.state.time}</span>
             <span>{currentCity}</span>
