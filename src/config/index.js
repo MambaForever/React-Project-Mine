@@ -4,3 +4,6 @@
 export const AK_VALUE = '3p49MVra6urFRGOT9s8UBWr2'
 // 请求天气信息的城市
 export const CITY = '白城'
+// 分页器每页显示数据的条数
+export const PAGE_SIZE = 3
+

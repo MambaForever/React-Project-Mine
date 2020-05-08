@@ -36,8 +36,17 @@ let getJsonpWeather = () => {
 let postLogin = userInfo => ajax.post('/login',userInfo)
 // 向后台发送获取分类列表请求
 let getCategoryList = () => ajax.get('/manage/category/list')
+// 向后台发送添加分类项的请求
+let postAddCategory = categoryName => ajax.post('/manage/category/add',{categoryName})
+// 向后台发送更新分类项的请求
+let postUpdateCategory = (categoryName,categoryId) => ajax.post('/manage/category/update',{categoryName,categoryId}) 
+// 向后台发送获取商品列表(分页)的请求(携带query参数)
+let getSqlProductList = pageParamsObj => ajax.get('/manage/product/list',{params:pageParamsObj})
+// 向后台发送搜索商品列表(分页)的请求(携带query参数)
+let getSearchProduct = paramsObj => ajax.get('/manage/product/search',{params:paramsObj})
+
 
 
 // 向外暴露发送请求的函数
-export {postLogin,getJsonpWeather,getCategoryList}
+export {postLogin,getJsonpWeather,getCategoryList,postAddCategory,postUpdateCategory,getSqlProductList,getSearchProduct}
 

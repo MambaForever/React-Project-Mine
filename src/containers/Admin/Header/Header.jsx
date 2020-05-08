@@ -105,7 +105,7 @@ class Header extends Component {
         </div>
         {/* 头部下方 */}
         <div className='header-bottom'>
-        <h2 className='bottom-left'>{this.props.title}</h2>
+          <h2 className='bottom-left'>{this.props.title}</h2>
           <div className='bottom-right'>
             <span>{this.state.time}</span>
             <span>{currentCity}</span>

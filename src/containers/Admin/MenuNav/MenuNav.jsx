@@ -31,23 +31,44 @@ class MenuNav extends Component {
 
   // 组件挂载完成的生命周期钩子
   componentDidMount(){
-    // this.initTitle(menus)
+    this.initTitle(menus)
   }
 
   // 此函数为刷新时传递当前title的逻辑函数
   initTitle = (menusArr) => {
     let {pathname} = this.props.location  // 得到当前路径
     let currentKey = pathname.split('/').slice(-1)[0]  // 通过路径得到当前菜单的key值
-    let currentObj = menusArr.find(menusObj => {  // 利用递归找到和当前菜单匹配的菜单配置对象
-        
-        if (menusObj.children) {
-          this.initTitle(menusObj.children)
+    // 如果是初次登陆,路径最后为admin,因路由重定向到home路由,所以直接将当前key改为home以保证title能够初始显示
+    if (currentKey==='admin') currentKey = 'home'
+    // 利用递归找到和当前菜单匹配的菜单配置对象
+    let currentObj = fun(menusArr)  
+    function fun(menusArr) {  // 递归逻辑函数
+      return menusArr.find(
+        menusObj => {
+          if (menusObj.children) {
+            // debugger
+            return fun(menusObj.children)
+          }else{
+            return menusObj.key === currentKey
+          }
         }
-        return menusObj.key === currentKey
-      
-    })
+      )
+    }
+    if (currentObj.children) {
+      currentObj = currentObj.children.find(menusObj => menusObj.key === currentKey)
+    }
     this.saveTitle(currentObj.title)
   }
+
+  /* let currentObj = menusArr.find(menusObj => {  // 利用递归找到和当前菜单匹配的菜单配置对象
+        
+      if (menusObj.children) {
+        this.initTitle(menusObj.children)
+      }else{
+        return menusObj.key === currentKey
+      }
+    
+  }) */
 
   // 点击传递title数据的回调
   saveTitle = title => {

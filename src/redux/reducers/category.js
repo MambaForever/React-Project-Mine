@@ -10,7 +10,7 @@ export default (preState=initState,action) => {
   let newState
   switch (type) {
     case UPDATE_CATEGORY_LIST:
-      newState = data
+      newState = data.reverse()  // 由于后台数据做的不好,需要我们在接收后手动将数据翻转以保证人性化显示
       break;
   
     default:
