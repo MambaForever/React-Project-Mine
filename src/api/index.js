@@ -44,9 +44,19 @@ let postUpdateCategory = (categoryName,categoryId) => ajax.post('/manage/categor
 let getSqlProductList = pageParamsObj => ajax.get('/manage/product/list',{params:pageParamsObj})
 // 向后台发送搜索商品列表(分页)的请求(携带query参数)
 let getSearchProduct = paramsObj => ajax.get('/manage/product/search',{params:paramsObj})
+// 向后台发送商品下架/上架的请求
+let postUpdateStatusOfProduct = params => ajax.post('/manage/product/updateStatus',params)
+// 向后台发送根据商品Id获取商品详情的请求
+let getProductDetailById = productId => ajax.get('/manage/product/info',{params:{productId}})
+// 向后台发送删除商品图片请求
+let postDeleteProductImg = name => ajax.post('/manage/img/delete',{name})
 
 
 
 // 向外暴露发送请求的函数
-export {postLogin,getJsonpWeather,getCategoryList,postAddCategory,postUpdateCategory,getSqlProductList,getSearchProduct}
+export {
+        postLogin,getJsonpWeather,getCategoryList,postAddCategory,postUpdateCategory,getSqlProductList,getSearchProduct,
+        postUpdateStatusOfProduct,getProductDetailById,postDeleteProductImg,
+       }
+
 

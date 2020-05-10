@@ -6,4 +6,6 @@ export const AK_VALUE = '3p49MVra6urFRGOT9s8UBWr2'
 export const CITY = '白城'
 // 分页器每页显示数据的条数
 export const PAGE_SIZE = 3
+// 请求后台图片的统一路径
+export const IMG_BASEURL = 'http://localhost:4000/upload/'
 

@@ -5,7 +5,7 @@ import { Card,Table,Button,Select,Input,message  } from 'antd';
 import {PlusCircleOutlined,SearchOutlined} from '@ant-design/icons';
 
 // 引入发送请求的API
-import {getSqlProductList,getSearchProduct} from '@/api'
+import {getSqlProductList,getSearchProduct,postUpdateStatusOfProduct} from '@/api'
 // 引入相关配置常量
 import {PAGE_SIZE} from '@/config'
 
@@ -67,9 +67,24 @@ export default class Product extends Component {
     this.getProductList()
   }
 
+  // 点击上架/下架更新商品状态的回调
+  updateStatus = async (currentStatus,id) => {
+    // 将状态改成将要更新的状态便于请求携带参数
+    currentStatus = currentStatus===1 ? 2 : 1
+    let result = await postUpdateStatusOfProduct({status:currentStatus,productId:id})
+    let {status,msg} = result
+    if (status===0) {  // 更新状态成功
+      message.success(currentStatus===1 ? '上架商品成功' : '下架商品成功')
+      this.getProductList(this.state.pageNum)
+    }else {  // 更新状态失败
+      message.error(msg)
+    }
+  }
+
 
   render() {
-    let {productList} = this.state
+    let {productList,pageNum,total} = this.state
+    let {push} = this.props.history
     // 数据源数组
     const dataSource = productList
     
@@ -96,15 +111,17 @@ export default class Product extends Component {
       },
       {
         title: '状态',
-        dataIndex: 'status',
+        // dataIndex: 'status',  // 开启此属性render的第一个参数将是此属性在数据源中对应的值,关闭则为当前数据源对象
         align: 'center',
         key: 'status',
-        render(status){
+        render: productObj => {
+          let {status,_id} = productObj
           return (
             <div>
               <Button 
                 type='primary' 
                 danger={status===1 ? true : false}
+                onClick={() => {this.updateStatus(status,_id)}}
               >
                 {status===1 ? '下架' : '上架'}
               </Button> 
@@ -116,13 +133,25 @@ export default class Product extends Component {
       },
       {
         title: '操作',
+        dataIndex: '_id',
         key: 'handle',
         align: 'center',
-        render(){
+        render: _id => {
           return (
             <div>
-              <Button type='link'>详情</Button> <br/>
-              <Button type='link'>修改</Button>
+              <Button 
+                type='link' 
+                onClick={() => {push(`/admin/prod_about/product/detail/${_id}`)}}
+              >
+                详情
+              </Button> 
+              <br/>
+              <Button 
+                type='link' 
+                onClick={() => {push(`/admin/prod_about/product/update/${_id}`)}}
+              >
+                修改
+              </Button>
             </div>
           )
         }
@@ -149,18 +178,25 @@ export default class Product extends Component {
               <Button type='primary' onClick={this.search}><SearchOutlined />搜索</Button>
             </div>
           } 
-          extra={<Button type='primary'><PlusCircleOutlined />添加商品</Button>} 
+          extra={
+          <Button 
+            type='primary'
+            onClick={() => {push('/admin/prod_about/product/add')}} // 编程式路由跳转到add路由
+          >
+            <PlusCircleOutlined />添加商品
+          </Button>} 
         >
           <Table 
             dataSource={dataSource}  // 数据源配置
             columns={columns}  // 列配置
             bordered  // 是否展示外边框和列边框
             rowKey='_id'  // 指定唯一值(key)在数据源中的对应项
+            loading={productList.length>0 ? false : true}   // 是否在数据加载时显示loading效果
             pagination={  // 分页器的配置对象
               {
                 pageSize: PAGE_SIZE,  // 每页数据条数
-                total: this.state.total,   // 数据总数
-                current: this.state.pageNum,  // 当前是第几页
+                total,   // 数据总数
+                current: pageNum,  // 当前是第几页
                 onChange: this.pageChange  // 页码改变的回调函数
               }
             } 

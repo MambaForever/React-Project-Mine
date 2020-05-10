@@ -40,6 +40,8 @@ class MenuNav extends Component {
     let currentKey = pathname.split('/').slice(-1)[0]  // 通过路径得到当前菜单的key值
     // 如果是初次登陆,路径最后为admin,因路由重定向到home路由,所以直接将当前key改为home以保证title能够初始显示
     if (currentKey==='admin') currentKey = 'home'
+    // 如果当前是product或product的子路由,都让其为product,以保证显示正常不报错
+    if (pathname.indexOf('product')!==-1) currentKey = 'product'
     // 利用递归找到和当前菜单匹配的菜单配置对象
     let currentObj = fun(menusArr)  
     function fun(menusArr) {  // 递归逻辑函数
@@ -104,6 +106,8 @@ class MenuNav extends Component {
     let {pathname} = this.props.location  // 得到当前路径
     let keyArr = pathname.split('/')  // 初始展开的菜单
     let currentKeyArr = keyArr.slice(-1)  // 初始选中的菜单
+    // 如果当前是product或product的子路由,都让其为product,以保证初始选中正常
+    if (keyArr.indexOf('product')!==-1) currentKeyArr = ['product']
 
     return (
       <div>
