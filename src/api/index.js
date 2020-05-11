@@ -50,13 +50,18 @@ let postUpdateStatusOfProduct = params => ajax.post('/manage/product/updateStatu
 let getProductDetailById = productId => ajax.get('/manage/product/info',{params:{productId}})
 // 向后台发送删除商品图片请求
 let postDeleteProductImg = name => ajax.post('/manage/img/delete',{name})
+// 向后台发送添加商品的请求
+let postAddProduct = productInfo => ajax.post('/manage/product/add',productInfo)
+// 向后台发送更新商品的请求
+let postUpdateProduct = productInfo => ajax.post('/manage/product/update',productInfo)
 
 
 
 // 向外暴露发送请求的函数
 export {
         postLogin,getJsonpWeather,getCategoryList,postAddCategory,postUpdateCategory,getSqlProductList,getSearchProduct,
-        postUpdateStatusOfProduct,getProductDetailById,postDeleteProductImg,
+        postUpdateStatusOfProduct,getProductDetailById,postDeleteProductImg,postAddProduct,postUpdateProduct,
+        
        }
 
 

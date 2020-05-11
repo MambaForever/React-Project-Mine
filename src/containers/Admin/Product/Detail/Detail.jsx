@@ -44,7 +44,6 @@ class Detail extends Component {
   render() {
     let {imgs, name, desc, price, categoryId, detail} = this.state.productDetail
     let {categoryList,history:{goBack}} = this.props
-    console.log(categoryList)
     return (
       <div>
         <Card 

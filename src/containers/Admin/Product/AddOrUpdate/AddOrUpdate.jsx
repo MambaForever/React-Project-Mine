@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-
 // 从antd库中按需引入标签组件
 import {Card,Button,Form,message,Input,Select,Upload, Modal} from 'antd'
 import {LeftCircleOutlined,PlusOutlined} from '@ant-design/icons';
 
 // 引入发送请求的API
-import {postDeleteProductImg} from '@/api'
+import {postDeleteProductImg,postAddProduct,postUpdateProduct,getProductDetailById} from '@/api'
 // 引入获取分类列表的异步action
 import {updateCategoryListAsync} from '@/redux/actions/category'
 
+// 引入子组件
+import RichText from './RichText/RichText'
 // 引入样式文件
 import './css/addOrUpdate.less'
+// 引入请求后台图片的统一路径
+import {IMG_BASEURL} from '@/config'
 
 const {Item} = Form
 const {Option} = Select
@@ -37,23 +40,55 @@ class AddOrUpdate extends Component {
     previewImage: '',   // 预览图片的url或base64
     previewTitle: '',  // 预览图片的标题(名字)
     fileList: [  // 上传的图片列表
-      
-      {
-        uid: '-4',  //必备属性，底层读取后作为react中的key去使用
-        name: 'image.png',  //图片名
-        status: 'done',  //图片状态，有：uploading done error removed中
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png', //图片地址
-      },
-      
+      // {
+      //   uid: '-4',  //必备属性，底层读取后作为react中的key去使用
+      //   name: 'image.png',  //图片名
+      //   status: 'done',  //图片状态，有：uploading done error removed中
+      //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png', //图片地址
+      // },
     ],
-  };
+    isUpdate: false  // 标识当前是否是修改商品
+  }
 
   // 组件挂载完成的生命周期钩子
   componentDidMount(){
+    let {id} = this.props.match.params
     let {categoryList,updateCategoryListAsync} = this.props
     // 判断如果没请求过分类列表,则请求
     if (categoryList.length===0) {
       updateCategoryListAsync()
+    }
+    // 判断当前操作是否是修改商品
+    if (id) {
+      this._id = id  // 如果是,将id存到组件实例上,方便接下来使用
+      this.setState({isUpdate: true})
+      this.getCurrentProduct(id)
+    }
+  }
+
+  // 获取当前商品信息数据的函数
+  getCurrentProduct = async (id) => {
+    let result = await getProductDetailById(id)
+    let {status,msg,data} = result
+    if (status===0) {
+      this.setState({isUpdate: false})
+      let {name,desc,price,categoryId,imgs,detail} = data
+      // 实现表单普通数据回显
+      this.refs.formInstance.setFieldsValue({name,desc,price,categoryId})
+      // 实现商品图片回显
+      let currentFileList = imgs.map((img,index) => {
+        return {
+          uid: index,
+          name: img,
+          status: 'done',
+          url: IMG_BASEURL + img
+        }
+      })
+      this.setState({fileList: currentFileList})
+      // 实现商品详情数据回显
+      this.richText.setDetail(detail)
+    }else{
+      message.error(msg)
     }
   }
 
@@ -101,12 +136,35 @@ class AddOrUpdate extends Component {
   }
 
   // 表单提交的回调
-  onFinish = values => {
-    console.log('Success:', values);
+  onFinish = async values => {
+    let {richText,_id,state:{fileList}} = this
+    // 得到上传商品图片名字所组成的数组
+    let imgs = fileList.reduce((preArr,item)=>{
+      preArr.push(item.name)
+      return preArr
+    },[])
+    // 得到文本编辑器中编辑的商品详情数据
+    let detail = richText.getDetail()
+    // 定义接收请求响应的变量
+    let result  
+    // 判断当前操作是否是修改商品
+    if (_id) {  // 修改商品
+      result = await postUpdateProduct({...values,imgs,detail,_id})
+    }else {  // 添加商品
+      result = await postAddProduct({...values,imgs,detail})
+    }
+    let {status,msg} = result
+    if (status===0) {
+      message.success(_id ? '修改商品成功' : '添加商品成功')
+      // 跳转到商品管理路由
+      this.props.history.replace('/admin/prod_about/product')
+    }else {
+      message.error(msg)
+    }
   }
 
   render() {
-    const { previewVisible, previewImage, fileList, previewTitle } = this.state;
+    const { previewVisible, previewImage, fileList, previewTitle,isUpdate } = this.state;
     const uploadButton = (
       <div>
         <PlusOutlined />
@@ -116,9 +174,6 @@ class AddOrUpdate extends Component {
     let {id} = this.props.match.params
     let {categoryList,history:{goBack}} = this.props
     return (
-      // <div>
-      //   {id ? 'UpdateOfProduct' : 'AddForProduct'}
-      // </div>
       <Card 
         title={
           <div>
@@ -126,12 +181,14 @@ class AddOrUpdate extends Component {
             <span style={{color: '#6c6c6c',fontSize: '18px'}}>{id ? '商品修改' : '商品添加'}</span>
           </div>
         }
+        loading={isUpdate}
       >
         <Form 
           onFinish={this.onFinish}  // 表单提价的回调
           labelCol={{span:3}}
           wrapperCol={{span:8}}
           initialValues={{categoryId:''}}
+          ref="formInstance"
         >
           <Item
             name="name"
@@ -188,6 +245,7 @@ class AddOrUpdate extends Component {
             </Select>
           </Item>
           <Item
+            // name="imgs"
             label="商品图片"  // label标签的内容
             className="add-item"
           >
@@ -213,8 +271,9 @@ class AddOrUpdate extends Component {
           <Item
             label="商品详情"  // label标签的内容
             className="add-item"
+            wrapperCol={{span:13}}
           >
-            此处放置富文本编辑器组件
+            <RichText ref={(node)=>{this.richText=node}} />
           </Item>
           <Item>
             <Button type="primary" htmlType="submit">
